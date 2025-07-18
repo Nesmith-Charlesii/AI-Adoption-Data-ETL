@@ -1,0 +1,4 @@
+ai_adoption_datastore:
+  file_type: csv
+  file_path: ai_adoption/ai_adoption_dataset.csv
+  sort_by: industry 
