@@ -23,6 +23,7 @@ class AIAdoptionETL:
         # Get output dir from config or default
         output_dir_name = self.datastore_config.get("output_dir", "separated_industries")
         self.output_dir = os.path.join(parent_dir, output_dir_name)
+        # exist_ok=True prevents Python from raising an error if the folder already exists
         os.makedirs(self.output_dir, exist_ok=True)
 
     def extract(self):
@@ -39,8 +40,14 @@ class AIAdoptionETL:
         if "industry" not in df.columns:
             raise KeyError("❌ Column 'industry' not found in the dataset.")
 
+        # Removes rows from the data frame where the industry column is missing
         df = df.dropna(subset=["industry"])
+        df = df.drop("user_feedback", axis=1)
 
+        df["estimated_users_per_year"] = None
+        df["new_users_2023_2024"] = None
+
+        # Checks first if there's a sory_by value and then checks if that value is in the data frame
         if self.sort_by and self.sort_by in df.columns:
             df = df.sort_values(by=self.sort_by)
 
