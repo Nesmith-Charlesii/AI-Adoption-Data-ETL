@@ -23,7 +23,6 @@ class AIAdoptionETL:
         # Get output dir from config or default
         output_dir_name = self.datastore_config.get("output_dir", "separated_industries")
         self.output_dir = os.path.join(parent_dir, output_dir_name)
-        # exist_ok=True prevents Python from raising an error if the folder already exists
         os.makedirs(self.output_dir, exist_ok=True)
 
     def extract(self):
@@ -40,17 +39,45 @@ class AIAdoptionETL:
         if "industry" not in df.columns:
             raise KeyError("❌ Column 'industry' not found in the dataset.")
 
-        # Removes rows from the data frame where the industry column is missing
+        # Drop rows with missing industry
         df = df.dropna(subset=["industry"])
-        df = df.drop("user_feedback", axis=1)
 
-        df["estimated_users_per_year"] = None
-        df["new_users_2023_2024"] = None
+        # Drop user_feedback column if it exists
+        if "user_feedback" in df.columns:
+            df = df.drop("user_feedback", axis=1)
 
-        # Checks first if there's a sory_by value and then checks if that value is in the data frame
+        # Convert year to int (if needed)
+        df["year"] = df["year"].astype(int)
+
+        # Calculate estimated users per year
+        df["estimated_users_per_year"] = df["daily_active_users"] * 365
+
+        # Create pivot table to compare daily active users in 2023 and 2024
+        pivot = df.pivot_table(
+            index=["country", "industry", "ai_tool"],
+            columns="year",
+            values="daily_active_users"
+        ).reset_index()
+
+        # Calculate new users from 2023 to 2024
+        pivot["new_users_2023_2024"] = pivot.get(2024) - pivot.get(2023)
+        pivot["new_users_2023_2024"] = pivot["new_users_2023_2024"].where(
+            pivot.get(2023).notna(), "N/A"
+        )
+
+        # Merge new_users_2023_2024 back into original dataframe
+        df = pd.merge(
+            df,
+            pivot[["country", "industry", "ai_tool", "new_users_2023_2024"]],
+            on=["country", "industry", "ai_tool"],
+            how="left"
+        )
+
+        # Sort by specified column
         if self.sort_by and self.sort_by in df.columns:
             df = df.sort_values(by=self.sort_by)
 
+        # Group by industry
         industry_dfs = {industry: group for industry, group in df.groupby("industry")}
         print(f"✅ Split into {len(industry_dfs)} industry groups.")
         return industry_dfs
