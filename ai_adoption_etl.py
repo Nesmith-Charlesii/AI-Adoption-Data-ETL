@@ -1,6 +1,7 @@
 import os
 import yaml
 import pandas as pd
+import zipfile
 
 DATA_STORE = "data_store"
 
@@ -91,10 +92,23 @@ class AIAdoptionETL:
             data.to_csv(path, index=False)
             print(f"📁 Saved {len(data)} rows to {filename}")
 
+    def zip_output(self):
+        zip_filename = f"{self.output_dir}.zip"
+        print(f"📦 Creating ZIP archive: {zip_filename}")
+        with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for root, _, files in os.walk(self.output_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, start=self.output_dir)
+                    zipf.write(file_path, arcname=arcname)
+        print("✅ ZIP archive created successfully.")
+
     def run(self):
         df = self.extract()
         industry_dfs = self.transform(df)
         self.load(industry_dfs)
+        self.zip_output()
+
 
 # Entry point
 if __name__ == "__main__":
