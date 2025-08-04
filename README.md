@@ -19,7 +19,9 @@ The AI Adoption ETL is a data pipeline that utilizes a dataset of nearly 150,000
 
 After cloning this repo, navigate to the root of the folder and run:
 
-```python3 -m venv venv```
+```
+python3 -m venv venv
+```
 
 This creates a virtual environment, where you will install dependencies and run the script.
 
@@ -28,11 +30,15 @@ This creates a virtual environment, where you will install dependencies and run 
 
 After a venv is created, activate your virtual environment.
 
-```source venv/bin/activate```
+```
+source venv/bin/activate
+```
 
 Install the required dependencies using:
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
 
 ### Running the ETL
