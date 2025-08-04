@@ -39,4 +39,6 @@ Install the required dependencies using:
 
 Once you've created and activated a virtual environment, from the root folder, simply run:
 
-```python3 ai_adoption_etl.py```
+```
+python3 ai_adoption_etl.py
+```
