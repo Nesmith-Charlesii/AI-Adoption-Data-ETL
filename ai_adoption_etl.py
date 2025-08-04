@@ -1,9 +1,11 @@
 import os
-import yaml
-import pandas as pd
 import zipfile
 
+import pandas as pd
+import yaml
+
 DATA_STORE = "data_store"
+
 
 class AIAdoptionETL:
     def __init__(self, config_filename="config.yaml"):
@@ -17,12 +19,16 @@ class AIAdoptionETL:
             self.config = yaml.safe_load(f)
 
         self.datastore_config = self.config.get("ai_adoption_datastore", {})
-        self.file_path = os.path.join(DATA_STORE, self.datastore_config.get("file_path", ""))
+        self.file_path = os.path.join(
+            DATA_STORE, self.datastore_config.get("file_path", "")
+        )
         self.file_type = self.datastore_config.get("file_type", "csv")
         self.sort_by = self.datastore_config.get("sort_by", None)
 
         # Get output dir from config or default
-        output_dir_name = self.datastore_config.get("output_dir", "separated_industries")
+        output_dir_name = self.datastore_config.get(
+            "output_dir", "separated_industries"
+        )
         self.output_dir = os.path.join(parent_dir, output_dir_name)
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -57,7 +63,7 @@ class AIAdoptionETL:
         pivot = df.pivot_table(
             index=["country", "industry", "ai_tool"],
             columns="year",
-            values="daily_active_users"
+            values="daily_active_users",
         ).reset_index()
 
         # Calculate new users from 2023 to 2024
@@ -71,7 +77,7 @@ class AIAdoptionETL:
             df,
             pivot[["country", "industry", "ai_tool", "new_users_2023_2024"]],
             on=["country", "industry", "ai_tool"],
-            how="left"
+            how="left",
         )
 
         # Sort by specified column

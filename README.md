@@ -48,3 +48,17 @@ Once you've created and activated a virtual environment, from the root folder, s
 ```
 python3 ai_adoption_etl.py
 ```
+
+## Generating a flake8-html report (Optional)
+
+Who doesn't like tidy code? This section is just a quick run-through of how to generate a flake8-html report that complies with PEP 8 - Style Guides for Python Code. In order to do this, you will need to utilize the flake8-html, isort, and black libraries. With that being said:
+
+If you have already installed the required dependencies from the requirments.txt file, then the libraries mentioned earlier are ready to be used. 
+
+From the root folder:
+
+1. Run ```black .``` - This will automatically format your python code to conform to a consistent style
+
+2. Run ```isort .``` - This will automatically sort your import statements into a constent order
+
+3. And last but not least, run ```flake8 . --format=html --htmldir=flake8-report``` - This will check for any style issues, linting, etc.
